@@ -79,14 +79,14 @@ public abstract class NettyRemotingBase {
 						return;
 					}else{
 						remotingResponse.setSendRequestOK(false);
+						//如果请求发送直接失败，则默认将其从responseTable这个篮子中移除
+						responseTable.remove(request.getOpaque());
+						//失败的异常信息
+						remotingResponse.setCause(future.cause());
+						//设置当前请求的返回主体返回体是null(请求失败的情况下，返回的结果肯定是null)
+						remotingResponse.putResponse(null);
+						logger.warn("use channel [{}] send msg [{}] failed and failed reason is [{}]",channel,request,future.cause().getMessage());
 					}
-					//如果请求发送直接失败，则默认将其从responseTable这个篮子中移除
-					responseTable.remove(request.getOpaque());
-					//失败的异常信息
-					remotingResponse.setCause(future.cause());
-					//设置当前请求的返回主体返回体是null(请求失败的情况下，返回的结果肯定是null)
-					remotingResponse.putResponse(null);
-					logger.warn("use channel [{}] send msg [{}] failed and failed reason is [{}]",channel,request,future.cause().getMessage());
 				}
 			});
 			
